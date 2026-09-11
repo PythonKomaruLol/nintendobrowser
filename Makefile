@@ -4,7 +4,21 @@ SOURCES		:=	.
 DATA		:=	data
 INCLUDES	:=	include
 
-# Проверяем переменную devkitPro
+# Строго задаем пути для devkitPro
+export DEVKITPRO	?=	/opt/devkitpro
+export DEVKITA64	?=	$(DEVKITPRO)/devkitA64
+export PATH			:=	$(DEVKITA64)/bin:$(PATH)
+
+# Префикс для инструментов ARM (чтобы вызывался правильный компилятор, а не системный)
+PREFIX		:=	aarch64-none-elf-
+export CC	:=	$(PREFIX)gcc
+export CXX	:=	$(PREFIX)g++
+export LD	:=	$(PREFIX)g++
+export AS	:=	$(PREFIX)as
+export AR	:=	$(PREFIX)ar
+export OBJCOPY := $(PREFIX)objcopy
+export STRIP := $(PREFIX)strip
+
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path>")
 endif
@@ -20,11 +34,10 @@ CFLAGS		:=	-g -Wall -O2 -ffunction-sections \
 CXXFLAGS	:=	$(CFLAGS) -std=gnu++17 -fno-rtti -fno-exceptions
 
 ASFLAGS		:=	-g $(ARCH)
-LDFLAGS		:=	-specs=$(DEVKITPRO)/libnx/switch_rules.specs $(ARCH) -Wl,--gc-sections
+LDFLAGS		:=	-specs=$(DEVKITPRO)/libnx/switch.specs $(ARCH) -Wl,--gc-sections
 
 LIBS		:=	-lnx -lm
 
-# Все файлы исходников
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
@@ -38,7 +51,6 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 
 export LIBDIRS	:=	$(DEVKITPRO)/libnx
 
-# Главная цель сборки должна стоять самой первой!
 all: $(TARGET).nro
 
 $(TARGET).nro: $(BUILD)/$(TARGET).elf
