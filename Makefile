@@ -9,7 +9,6 @@ export DEVKITPRO	?=	/opt/devkitpro
 export DEVKITA64	?=	$(DEVKITPRO)/devkitA64
 export PATH			:=	$(DEVKITA64)/bin:$(PATH)
 
-# Префикс для инструментов ARM (чтобы вызывался правильный компилятор, а не системный)
 PREFIX		:=	aarch64-none-elf-
 export CC	:=	$(PREFIX)gcc
 export CXX	:=	$(PREFIX)g++
@@ -25,7 +24,6 @@ endif
 
 export TOPDIR	:=	$(CURDIR)
 
-# Архитектура и флаги
 ARCH		:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS		:=	-g -Wall -O2 -ffunction-sections \
@@ -52,6 +50,12 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 export LIBDIRS	:=	$(DEVKITPRO)/libnx
 
 all: $(TARGET).nro
+
+# Принудительно создаем папку build перед линковкой
+$(BUILD)/$(TARGET).elf: | $(BUILD)
+
+$(BUILD):
+	mkdir -p $@
 
 $(TARGET).nro: $(BUILD)/$(TARGET).elf
 
