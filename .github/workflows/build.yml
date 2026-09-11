@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Используем официальный контейнер devkitPro со всеми настроенными инструментами
     container:
       image: devkitpro/devkita64:latest
 
@@ -19,7 +18,11 @@ jobs:
 
       - name: Compile NRO
         run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITA64=/opt/devkitpro/devkitA64
+          export PATH=$DEVKITA64/bin:$PATH
           make
+        shell: bash
 
       - name: Upload compiled NRO
         uses: actions/upload-artifact@v4
