@@ -1,0 +1,28 @@
+name: Build Nintendo Switch NRO
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Используем официальный контейнер devkitPro со всеми настроенными инструментами
+    container:
+      image: devkitpro/devkita64:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile NRO
+        run: |
+          make
+
+      - name: Upload compiled NRO
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyBrowser-NRO
+          path: MyBrowser.nro
